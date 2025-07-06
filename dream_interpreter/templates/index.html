@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Генератор и Толкователь Снов</title>
+  <meta name="description" content="Приложение для генерации и толкования снов">
+  <meta name="theme-color" content="#000000">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="manifest" crossorigin="use-credentials" href="/manifest.json">
+</head>
+<body>
+  <div class="container">
+    <h1>🔮 Генератор и Толкователь Снов</h1>
+    <form id="dream-form">
+      <textarea id="dream-input" placeholder="Опишите свой сон... Например: 'Я летел на пицце над городом из желе'"></textarea>
+      <button type="submit">Создать сон</button>
+    </form>
+
+    <div id="result" class="hidden">
+      <img id="generated-image" src="" alt="Сгенерированный сон" />
+      <p id="interpretation-text"></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("dream-form").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const input = document.getElementById("dream-input").value;
+      const result = document.getElementById("result");
+      const image = document.getElementById("generated-image");
+      const text = document.getElementById("interpretation-text");
+      result.classList.add("hidden");
+      image.src = ""
+      text.textContent = ""
+      const response = await fetch("/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dream: input })
+      });
+
+      const data = await response.json();
+      image.src = "http://127.0.0.1:5000/static/image.jpg?" + new Date().getTime()
+      text.textContent = data.interpretation;
+      result.classList.remove("hidden");
+    });
+  </script>
+</body>
+</html>
